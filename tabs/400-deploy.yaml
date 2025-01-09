@@ -1,0 +1,42 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: tabs
+  name: tabs
+  labels:
+    app: tabs
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tabs
+  template:
+    metadata:
+      labels:
+        app: tabs
+    spec:
+      containers:
+        - name: tabs
+          image: ${TABS_IMAGE}:${TABS_VERSION}
+          args: ['node', '/usr/src/app/index.js']
+          ports:
+            - name: tabs
+              containerPort: 80
+          env:
+            - name: APP_PORT
+              value: "80"
+            - name : MYSQL_HOST
+              value: mysql.mysql
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_DATABASE
+              value: tabs
+            - name: MYSQL_USER
+              value: tabs
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tabs
+                  key: MYSQL_PASSWORD

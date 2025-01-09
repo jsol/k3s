@@ -1,0 +1,48 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: dgraph
+  name: dgraph-alpha
+  labels:
+    app: dgraph-alpha
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dgraph-alpha
+  template:
+    metadata:
+      labels:
+        app: dgraph-alpha
+    spec:
+      containers:
+        - name: alpha
+          image: dgraph/dgraph:${DGRAPH_VERSION}
+          # This comman only work for a single-node setup...
+          command:
+          - bash
+          - "-c"
+          - |
+            set -ex
+            exec dgraph alpha --my=dgraph-alpha.dgraph:7080 --zero dgraph-zero.dgraph:5080
+          ports:
+            - name: grpc-alpha-int
+              containerPort: 7080
+            - name: http-alpha
+              containerPort: 8080
+            - name: grpc-alpha
+              containerPort: 9080
+          volumeMounts:
+            - name: dgraph-alpha-pv-storage
+              mountPath: /data
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      volumes:
+        - name: dgraph-alpha-pv-storage
+          persistentVolumeClaim:
+            claimName: dgraph-alpha-pvc

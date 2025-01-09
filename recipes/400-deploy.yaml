@@ -1,0 +1,25 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: recipes
+  name: recipes
+  labels:
+    app: recipes
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes
+  template:
+    metadata:
+      labels:
+        app: recipes
+    spec:
+      containers:
+        - name: recipes
+          image: ${RECIPES_IMAGE}:${RECIPES_VERSION}
+          ports:
+            - name: recipes
+              containerPort: 80

@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dgraph-alpha
+  namespace: dgraph
+spec:
+  type: ClusterIP
+  ports:
+    # Need internal since we do the work-around of routing through service
+    # since the hostname resolve doesn't seem to work
+    - protocol: TCP
+      name: http-alpha-int
+      port: 7080
+    - protocol: TCP
+      name: http-alpha
+      targetPort: 8080
+      port: 10080 # Non-standard, but unifi needs the 8080 port on the node
+    - protocol: TCP
+      name: grpc-alpha
+      port: 9080
+  selector:
+    app: dgraph-alpha

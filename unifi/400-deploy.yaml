@@ -1,0 +1,59 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: unifi
+  name: unifi
+  labels:
+    app: unifi
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unifi
+  template:
+    metadata:
+      labels:
+        app: unifi
+    spec:
+      containers:
+        - name: unifi
+          image: lscr.io/linuxserver/unifi-network-application:${UNIFI_VERSION}
+          ports:
+          - containerPort: 3478
+            protocol: UDP
+          - containerPort: 10001
+            protocol: UDP
+          - containerPort: 5514
+            protocol: UDP
+          - containerPort: 8080
+          - containerPort: 8443
+          volumeMounts:
+            - name: unifi-pv-storage
+              mountPath: /config
+          env:
+            - name: TZ
+              value: CET
+            - name: MONGO_HOST
+              value: mongodb.mongodb
+            - name: MONGO_PORT
+              value: "27017"
+            - name: MONGO_DBNAME
+              value: unifi
+            - name: MONGO_AUTHSOURCE
+              value: admin
+            - name: MONGO_USER
+              valueFrom:
+                secretKeyRef:
+                  name: unifi
+                  key: MONGO_USER
+            - name: MONGO_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: unifi
+                  key: MONGO_PASSWORD
+      volumes:
+        - name: unifi-pv-storage
+          persistentVolumeClaim:
+            claimName: unifi-pvc

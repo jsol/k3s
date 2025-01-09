@@ -1,0 +1,50 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: mysql
+  name: mysql
+  labels:
+    app: mysql
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:${MYSQL_VERSION}
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - name: mysql-config-volume
+              mountPath: /etc/mysql/mysql.conf.d/my-custom.cnf
+              subPath: my-custom.cnf
+            - name: mysql-pv-storage
+              mountPath: /var/lib/mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_ROOT_HOST
+              value: "%"
+      volumes:
+        - name: mysql-config-volume
+          configMap:
+            name: mysql-config
+            items:
+            - key: main-config
+              path: my-custom.cnf      
+
+        - name: mysql-pv-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc

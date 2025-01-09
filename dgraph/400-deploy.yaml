@@ -1,0 +1,46 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: dgraph
+  name: dgraph-zero
+  labels:
+    app: dgraph-zero
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dgraph-zero
+  template:
+    metadata:
+      labels:
+        app: dgraph-zero
+    spec:
+      containers:
+        - name: zero
+          image: dgraph/dgraph:${DGRAPH_VERSION}
+          # This comman only work for a single-node setup...
+          command:
+          - bash
+          - "-c"
+          - |
+            set -ex
+            exec dgraph zero --my=dgraph-zero.dgraph:5080
+          ports:
+            - name: grpc-zero
+              containerPort: 5080
+            - name: http-zero
+              containerPort: 6080
+          volumeMounts:
+            - name: dgraph-zero-pv-storage
+              mountPath: /data
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+      volumes:
+        - name: dgraph-zero-pv-storage
+          persistentVolumeClaim:
+            claimName: dgraph-zero-pvc
