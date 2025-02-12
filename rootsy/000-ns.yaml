@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rootsy # Change this value if you want a different namespace name
+  labels:
+    name: rootsy # Change this value to match metadata.name

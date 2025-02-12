@@ -1,0 +1,37 @@
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rootsy
+  namespace: rootsy
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: ${ROOTSY_FQDN}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rootsy
+            port:
+              number: 9090
+  - host: ${ROOTSY_SHORT}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: rootsy
+            port:
+              number: 9090
+  tls:
+    - secretName: rootsy-tls
+      hosts:
+        - ${ROOTSY_FQDN}
+        - ${ROOTSY_SHORT}

@@ -34,7 +34,7 @@ spec:
               containerPort: 6080
           volumeMounts:
             - name: dgraph-zero-pv-storage
-              mountPath: /data
+              mountPath: /dgraph
           env:
             - name: POD_NAMESPACE
               valueFrom:

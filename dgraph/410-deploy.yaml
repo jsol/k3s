@@ -36,7 +36,7 @@ spec:
               containerPort: 9080
           volumeMounts:
             - name: dgraph-alpha-pv-storage
-              mountPath: /data
+              mountPath: /dgraph
           env:
             - name: POD_NAMESPACE
               valueFrom:

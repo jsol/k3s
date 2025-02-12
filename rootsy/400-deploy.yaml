@@ -1,0 +1,48 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: rootsy
+  name: rootsy
+  labels:
+    app: rootsy
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rootsy
+  template:
+    metadata:
+      labels:
+        app: rootsy
+    spec:
+      containers:
+        - name: rootsy
+          image: ${ROOTSY_IMAGE}:${ROOTSY_VERSION}
+          ports:
+            - name: rootsy
+              containerPort: 9090
+          env:
+            - name : DGRAPH_URL
+              value: "dgraph-alpha.dgraph:9080"
+            - name: SPOTIFY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: rootsy
+                  key: SPOTIFY_KEY
+            - name: SPOTIFY_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: rootsy
+                  key: SPOTIFY_SECRET
+            - name: AUTH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: rootsy
+                  key: AUTH_USERNAME
+            - name: AUTH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rootsy
+                  key: AUTH_PASSWORD
