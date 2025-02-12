@@ -1,0 +1,35 @@
+---
+kind: CronJob
+apiVersion: batch/v1
+metadata:
+  namespace: loopia
+  name: loopia
+
+spec:
+  schedule: "7 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: loopia
+              image: ${LOOPIA_IMAGE}:${LOOPIA_VERSION}
+              volumeMounts:
+                - name: loopia-storage
+                  mountPath: /data
+              env:
+                - name: LOOPIA_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: loopia
+                      key: LOOPIA_USER
+                - name: LOOPIA_PASS
+                  valueFrom:
+                    secretKeyRef:
+                      name: loopia
+                      key: LOOPIA_PASS
+          volumes:
+            - name: loopia-storage
+              persistentVolumeClaim:
+                claimName: loopia-pvc
