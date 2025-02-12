@@ -1,0 +1,42 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  namespace: pedell
+  name: pedell
+  labels:
+    app: pedell
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pedell
+  template:
+    metadata:
+      labels:
+        app: pedell
+    spec:
+      containers:
+        - name: pedell
+          image: ${PEDELL_IMAGE}:${PEDELL_VERSION}
+          ports:
+            - name: pedell
+              containerPort: 80
+          env:
+            - name : MYSQL_HOST
+              value: mysql.mysql
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_DB
+              value: skiphte
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: pedell
+                  key: MYSQL_USER
+            - name: MYSQL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: pedell
+                  key: MYSQL_PASSWORD

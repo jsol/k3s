@@ -1,0 +1,26 @@
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pedell
+  namespace: pedell
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: traefik
+  rules:
+  - host: ${PEDELL_FQDN}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pedell
+            port:
+              number: 80
+  tls:
+    - secretName: pedell-tls
+      hosts:
+        - ${PEDELL_FQDN}
